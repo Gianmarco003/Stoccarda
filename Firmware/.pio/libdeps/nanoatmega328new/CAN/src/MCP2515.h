@@ -10,7 +10,7 @@
 
 #include "CANController.h"
 
-#define MCP2515_DEFAULT_CLOCK_FREQUENCY 16e6
+#define MCP2515_DEFAULT_CLOCK_FREQUENCY 8e6
 
 #if defined(ARDUINO_ARCH_SAMD) && defined(PIN_SPI_MISO) && defined(PIN_SPI_MOSI) && defined(PIN_SPI_SCK) && (PIN_SPI_MISO == 10) && (PIN_SPI_MOSI == 8) && (PIN_SPI_SCK == 9)
 // Arduino MKR board: MKR CAN shield CS is pin 3, INT is pin 7
