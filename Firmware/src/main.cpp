@@ -22,11 +22,11 @@ int obdOilTemp = 92;
 
 int Fuel;
 int Coolant;
-int RPM;
+int RPM = -1;
 int IntakeAirTemp;
 int MAF;
 int BarometricPressure;
-int CatalystTemp1;
+int CatalystTemp1 = 0;
 int CatalystTemp2;
 int Voltage;
 int AmbientAirTemp;
@@ -184,9 +184,144 @@ void lcdInit()
     lcd.print("Oil:      |Cat:");
 }
 
+void accelerationCalc()
+{
+    Speed = OBD2.pidRead(obdSpeed);
+    elapsed = chrono.elapsed();
+    acceleration = ((Speed * 10000) - (lastSpeed * 10000)) / elapsed;
+    lastSpeed = Speed;
+    chrono.restart();
+}
+
+void obdRead()
+{
+    switch (OBDidRead)
+    {
+    case 0:
+        Coolant = OBD2.pidRead(obdCoolant);
+        IntakeAirTemp = OBD2.pidRead(obdIntakeAirTemp);
+        MAF = OBD2.pidRead(obdMAF);
+        BarometricPressure = OBD2.pidRead(obdBarometricPressure);
+        OilTemp = OBD2.pidRead(obdOilTemp);
+    case 1:
+        Coolant = OBD2.pidRead(obdCoolant);
+        break;
+
+    case 2:
+        IntakeAirTemp = OBD2.pidRead(obdIntakeAirTemp);
+        break;
+
+    case 3:
+        MAF = OBD2.pidRead(obdMAF);
+        break;
+
+    case 4:
+        BarometricPressure = OBD2.pidRead(obdBarometricPressure);
+        break;
+
+    case 5:
+        if (OBD2.pidRead(obdRPM) > 0 && RPM == -1)
+        {
+            RPM = 0;
+        }
+        if (RPM >= 0)
+        {
+            CatalystTemp1 = OBD2.pidRead(obdCatalystTemp1);
+        }
+        break;
+
+    case 6:
+        OilTemp = OBD2.pidRead(obdOilTemp);
+        break;
+
+    default:
+        OBDidRead = 0;
+        break;
+    }
+
+    OBDidRead++;
+
+    // Speed = OBD2.pidRead(obdSpeed);
+    // CatalystTemp2 = OBD2.pidRead(obdCatalystTemp2);
+    // AmbientAirTemp = OBD2.pidRead(obdAmbientAirTemp);
+    // Fuel = OBD2.pidRead(obdFuel);
+    // RPM = OBD2.pidRead(obdRPM);
+    // Voltage = OBD2.pidRead(obdVoltage);
+}
+
+String formatInt(float data)
+{
+    sprintf(buffer, "%3d", (int)data);
+    return buffer;
+}
+
+void lcdData()
+{
+    lcd.setCursor(6, 0);
+    lcd.print(formatInt(Speed));
+
+    lcd.setCursor(6, 1);
+    lcd.print(formatInt(IntakeAirTemp));
+
+    lcd.setCursor(6, 2);
+    lcd.print(formatInt(Coolant));
+
+    lcd.setCursor(6, 3);
+    lcd.print(formatInt(OilTemp));
+
+    lcd.setCursor(17, 0);
+    lcd.print(formatInt(acceleration));
+
+    lcd.setCursor(17, 1);
+    lcd.print(formatInt(MAF));
+
+    lcd.setCursor(17, 2);
+    lcd.print(formatInt(BarometricPressure));
+
+    lcd.setCursor(17, 3);
+    lcd.print(formatInt(CatalystTemp1));
+}
+
+void serialData()
+{
+    Serial.print(">");
+
+    Serial.print("Speed: ");
+    Serial.print(formatInt(Speed));
+    Serial.print(", ");
+
+    Serial.print("Intake: ");
+    Serial.print(formatInt(IntakeAirTemp));
+    Serial.print(", ");
+
+    Serial.print("Coolant: ");
+    Serial.print(formatInt(Coolant));
+    Serial.print(", ");
+
+    Serial.print("Oil: ");
+    Serial.print(formatInt(OilTemp));
+    Serial.print(", ");
+
+    Serial.print("Acceleration: ");
+    Serial.print(formatInt(acceleration));
+    Serial.print(", ");
+
+    Serial.print("MAF: ");
+    Serial.print(formatInt(MAF));
+    Serial.print(", ");
+
+    Serial.print("Pressure: ");
+    Serial.print(formatInt(BarometricPressure));
+    Serial.print(", ");
+
+    Serial.print("Catalyst: ");
+    Serial.print(formatInt(CatalystTemp1));
+    Serial.println();
+}
+
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
     lcd.begin(20, 4);
     lcd.clear();
     lcdStartScreen();
@@ -211,96 +346,11 @@ void setup()
     lcdInit();
 }
 
-void obdRead()
-{
-    switch (OBDidRead)
-    {
-    case 0:
-        Coolant = OBD2.pidRead(obdCoolant);
-        break;
-
-    case 1:
-        IntakeAirTemp = OBD2.pidRead(obdIntakeAirTemp);
-        break;
-
-    case 2:
-        MAF = OBD2.pidRead(obdMAF);
-        break;
-
-    case 3:
-        BarometricPressure = OBD2.pidRead(obdBarometricPressure);
-        break;
-
-    case 4:
-        CatalystTemp1 = OBD2.pidRead(obdCatalystTemp1);
-        break;
-
-    case 5:
-        OilTemp = OBD2.pidRead(obdOilTemp);
-        break;
-
-    default:
-        OBDidRead = 0;
-        break;
-    }
-
-    OBDidRead++;
-
-    // Speed = OBD2.pidRead(obdSpeed);
-    // CatalystTemp2 = OBD2.pidRead(obdCatalystTemp2);
-    // AmbientAirTemp = OBD2.pidRead(obdAmbientAirTemp);
-    // Fuel = OBD2.pidRead(obdFuel);
-    // RPM = OBD2.pidRead(obdRPM);
-    // Voltage = OBD2.pidRead(obdVoltage);
-}
-
-void accelerationCalc()
-{
-    delay(100);
-    Speed = OBD2.pidRead(obdSpeed);
-    elapsed = chrono.elapsed();
-    acceleration = ((Speed * 1000) - (lastSpeed * 1000)) / elapsed;
-    lastSpeed = Speed;
-    chrono.restart();
-}
-
-String formatInt(float data)
-{
-    sprintf(buffer, "%3d", (int)data);
-    return buffer;
-}
-
-void lcdData()
-{
-    lcd.setCursor(6, 0);
-    lcd.print(formatInt(Speed));
-
-    lcd.setCursor(6, 1);
-    lcd.print(formatInt(IntakeAirTemp));
-
-    lcd.setCursor(6, 2);
-    lcd.print(formatInt(Coolant));
-
-    lcd.setCursor(6, 3);
-    lcd.print(formatInt(OilTemp));
-
-    lcd.setCursor(17, 0);
-    accelerationCalc();
-    lcd.print(formatInt(acceleration));
-
-    lcd.setCursor(17, 1);
-    lcd.print(formatInt(MAF));
-
-    lcd.setCursor(17, 2);
-    lcd.print(formatInt(BarometricPressure));
-
-    lcd.setCursor(17, 3);
-    lcd.print(formatInt(CatalystTemp1));
-}
-
 void loop()
 {
     obdRead();
+    accelerationCalc();
     lcdData();
-    Serial.println("loop");
+    serialData();
+    delay(100);
 }
