@@ -36,7 +36,7 @@ float lastSpeed;
 
 Chrono chrono;
 int elapsed;
-int accelleration;
+int acceleration;
 
 int OBDidRead = 0;
 
@@ -254,12 +254,12 @@ void obdRead()
     // Voltage = OBD2.pidRead(obdVoltage);
 }
 
-void accellerationCalc()
+void accelerationCalc()
 {
-    delay(1000);
+    delay(100);
     Speed = OBD2.pidRead(obdSpeed);
     elapsed = chrono.elapsed();
-    accelleration = ((Speed * 1000) - (lastSpeed * 1000)) / elapsed;
+    acceleration = ((Speed * 1000) - (lastSpeed * 1000)) / elapsed;
     lastSpeed = Speed;
     chrono.restart();
 }
@@ -285,8 +285,8 @@ void lcdData()
     lcd.print(formatInt(OilTemp));
 
     lcd.setCursor(17, 0);
-    accellerationCalc();
-    lcd.print(formatInt(accelleration));
+    accelerationCalc();
+    lcd.print(formatInt(acceleration));
 
     lcd.setCursor(17, 1);
     lcd.print(formatInt(MAF));
