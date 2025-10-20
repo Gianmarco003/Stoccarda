@@ -175,13 +175,13 @@ void lcdInit()
 {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Speed:    | Acc:");
+    lcd.print("Speed:    |Acc:");
     lcd.setCursor(0, 1);
-    lcd.print("A/in:    | MAF:");
+    lcd.print("A/in:     |MAF:");
     lcd.setCursor(0, 2);
-    lcd.print("Cool:    | Baro:");
+    lcd.print("Cool:     |Baro:");
     lcd.setCursor(0, 3);
-    lcd.print("Oil:     | Cat:");
+    lcd.print("Oil:      |Cat:");
 }
 
 void setup()
@@ -256,6 +256,7 @@ void obdRead()
 
 void accellerationCalc()
 {
+    delay(1000);
     Speed = OBD2.pidRead(obdSpeed);
     elapsed = chrono.elapsed();
     accelleration = ((Speed * 1000) - (lastSpeed * 1000)) / elapsed;
@@ -271,19 +272,20 @@ String formatInt(float data)
 
 void lcdData()
 {
-    lcd.setCursor(5, 0);
+    lcd.setCursor(6, 0);
     lcd.print(formatInt(Speed));
 
-    lcd.setCursor(5, 1);
+    lcd.setCursor(6, 1);
     lcd.print(formatInt(IntakeAirTemp));
 
-    lcd.setCursor(5, 2);
+    lcd.setCursor(6, 2);
     lcd.print(formatInt(Coolant));
 
-    lcd.setCursor(5, 3);
+    lcd.setCursor(6, 3);
     lcd.print(formatInt(OilTemp));
 
     lcd.setCursor(17, 0);
+    accellerationCalc();
     lcd.print(formatInt(accelleration));
 
     lcd.setCursor(17, 1);
@@ -300,6 +302,5 @@ void loop()
 {
     obdRead();
     lcdData();
-    accellerationCalc();
     Serial.println("loop");
 }
