@@ -29,7 +29,7 @@ int MAF;
 int BarometricPressure;
 int CatalystTemp1 = 0;
 int CatalystTemp2;
-int Voltage;
+float Voltage;
 int AmbientAirTemp;
 int OilTemp;
 float Speed;
@@ -276,8 +276,8 @@ void lcdData()
     lcd.setCursor(6, 3);
     lcd.print(formatInt(OilTemp));
 
-    lcd.setCursor(16, 0);
-    lcd.print(formatInt(Voltage));
+    lcd.setCursor(15, 0);
+    lcd.print(Voltage);
 
     lcd.setCursor(16, 1);
     lcd.print(formatInt(MAF));
@@ -294,35 +294,35 @@ void serialData()
     Serial.print(">");
 
     Serial.print("Speed: ");
-    Serial.print(formatInt(Speed));
+    Serial.print(Speed);
     Serial.print(", ");
 
     Serial.print("Intake: ");
-    Serial.print(formatInt(IntakeAirTemp));
+    Serial.print(IntakeAirTemp);
     Serial.print(", ");
 
     Serial.print("Coolant: ");
-    Serial.print(formatInt(Coolant));
+    Serial.print(Coolant);
     Serial.print(", ");
 
     Serial.print("Oil: ");
-    Serial.print(formatInt(OilTemp));
+    Serial.print(OilTemp);
     Serial.print(", ");
 
     Serial.print("Battery: ");
-    Serial.print(formatInt(Voltage));
+    Serial.print(Voltage);
     Serial.print(", ");
 
     Serial.print("MAF: ");
-    Serial.print(formatInt(MAF));
+    Serial.print(MAF);
     Serial.print(", ");
 
     Serial.print("Pressure: ");
-    Serial.print(formatInt(BarometricPressure));
+    Serial.print(BarometricPressure);
     Serial.print(", ");
 
     Serial.print("Catalyst: ");
-    Serial.print(formatInt(CatalystTemp1));
+    Serial.print(CatalystTemp1);
     Serial.println();
 }
 
