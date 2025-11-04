@@ -176,7 +176,7 @@ void lcdInit()
 {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Speed:    |Acc:");
+    lcd.print("Speed:    |Bat:");
     lcd.setCursor(0, 1);
     lcd.print("A/in:     |MAF:");
     lcd.setCursor(0, 2);
@@ -204,6 +204,8 @@ void obdRead()
         MAF = OBD2.pidRead(obdMAF);
         BarometricPressure = OBD2.pidRead(obdBarometricPressure);
         OilTemp = OBD2.pidRead(obdOilTemp);
+        Voltage = OBD2.pidRead(obdVoltage);
+
     case 1:
         Coolant = OBD2.pidRead(obdCoolant);
         break;
@@ -234,6 +236,12 @@ void obdRead()
     case 6:
         OilTemp = OBD2.pidRead(obdOilTemp);
         break;
+    case 7:
+        Voltage = OBD2.pidRead(obdVoltage);
+        break;
+    case 8:
+        Speed = OBD2.pidRead(obdSpeed);
+        break;
 
     default:
         OBDidRead = 0;
@@ -242,17 +250,15 @@ void obdRead()
 
     OBDidRead++;
 
-    // Speed = OBD2.pidRead(obdSpeed);
     // CatalystTemp2 = OBD2.pidRead(obdCatalystTemp2);
     // AmbientAirTemp = OBD2.pidRead(obdAmbientAirTemp);
     // Fuel = OBD2.pidRead(obdFuel);
     // RPM = OBD2.pidRead(obdRPM);
-    // Voltage = OBD2.pidRead(obdVoltage);
 }
 
 String formatInt(float data)
 {
-    sprintf(buffer, "%3d", (int)data);
+    sprintf(buffer, "%4d", (int)data);
     return buffer;
 }
 
@@ -270,16 +276,16 @@ void lcdData()
     lcd.setCursor(6, 3);
     lcd.print(formatInt(OilTemp));
 
-    lcd.setCursor(17, 0);
-    lcd.print(formatInt(acceleration));
+    lcd.setCursor(16, 0);
+    lcd.print(formatInt(Voltage));
 
-    lcd.setCursor(17, 1);
+    lcd.setCursor(16, 1);
     lcd.print(formatInt(MAF));
 
-    lcd.setCursor(17, 2);
+    lcd.setCursor(16, 2);
     lcd.print(formatInt(BarometricPressure));
 
-    lcd.setCursor(17, 3);
+    lcd.setCursor(16, 3);
     lcd.print(formatInt(CatalystTemp1));
 }
 
@@ -303,8 +309,8 @@ void serialData()
     Serial.print(formatInt(OilTemp));
     Serial.print(", ");
 
-    Serial.print("Acceleration: ");
-    Serial.print(formatInt(acceleration));
+    Serial.print("Battery: ");
+    Serial.print(formatInt(Voltage));
     Serial.print(", ");
 
     Serial.print("MAF: ");
@@ -350,7 +356,6 @@ void setup()
 void loop()
 {
     obdRead();
-    accelerationCalc();
     lcdData();
     serialData();
     delay(100);
